@@ -1,8 +1,36 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { AuthContext } from "./AuthContext";
-import Auth from "./Auth";
-import "./home.css";
+const LS_USERS = "tt_users_v1";
+const LS_SESSION = "tt_session_v1";
+const Auth = {
+  signup({ name, email, password }) {
+    const users = JSON.parse(localStorage.getItem(LS_USERS) || "[]");
+    if (users.find((u) => u.email === email)) {
+      return { ok: false, message: "Email already registered." };
+    }
+    users.push({ name, email, password });
+    localStorage.setItem(LS_USERS, JSON.stringify(users));
+    return { ok: true };
+  },
+  login(email, password) {
+    const users = JSON.parse(localStorage.getItem(LS_USERS) || "[]");
+    const match = users.find((u) => u.email === email && u.password === password);
+    if (!match) return { ok: false, message: "Invalid credentials." };
+    localStorage.setItem(LS_SESSION, JSON.stringify({ email: match.email, name: match.name }));
+    return { ok: true };
+  },
+  logout() {
+    localStorage.removeItem(LS_SESSION);
+  },
+  me() {
+    try {
+      return JSON.parse(localStorage.getItem(LS_SESSION) || "null");
+    } catch {
+      return null;
+    }
+  },
+};
+const AuthContext = React.createContext(null);
 function Login() {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
@@ -21,11 +49,13 @@ function Login() {
     auth.setUser(Auth.me());
     navigate(from, { replace: true });
   }
+
   return (
     <div className="auth-page">
       <div className="auth-background">
         <div className="background-overlay"></div>
       </div>
+      
       <section className="section">
         <div className="container">
           <div className="card auth-card" style={{padding:20, position: 'relative', zIndex: 2}}>
