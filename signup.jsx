@@ -1,13 +1,39 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Auth from "./Auth";
-import "./home.css";
-
+const LS_USERS = "tt_users_v1";
+const LS_SESSION = "tt_session_v1";
+const Auth = {
+  signup({ name, email, password }) {
+    const users = JSON.parse(localStorage.getItem(LS_USERS) || "[]");
+    if (users.find((u) => u.email === email)) {
+      return { ok: false, message: "Email already registered." };
+    }
+    users.push({ name, email, password });
+    localStorage.setItem(LS_USERS, JSON.stringify(users));
+    return { ok: true };
+  },
+  login(email, password) {
+    const users = JSON.parse(localStorage.getItem(LS_USERS) || "[]");
+    const match = users.find((u) => u.email === email && u.password === password);
+    if (!match) return { ok: false, message: "Invalid credentials." };
+    localStorage.setItem(LS_SESSION, JSON.stringify({ email: match.email, name: match.name }));
+    return { ok: true };
+  },
+  logout() {
+    localStorage.removeItem(LS_SESSION);
+  },
+  me() {
+    try {
+      return JSON.parse(localStorage.getItem(LS_SESSION) || "null");
+    } catch {
+      return null;
+    }
+  },
+};
 function Signup() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
   const [err, setErr] = useState("");
-
   function submit(e) {
     e.preventDefault();
     setErr("");
@@ -19,13 +45,11 @@ function Signup() {
     alert("Account created. Please login.");
     navigate("/login");
   }
-
   return (
     <div className="auth-page">
       <div className="auth-background">
         <div className="background-overlay"></div>
       </div>
-      
       <section className="section">
         <div className="container">
           <div className="card auth-card" style={{padding:20, position: 'relative', zIndex: 2}}>
@@ -46,5 +70,4 @@ function Signup() {
     </div>
   );
 }
-
 export default Signup;
