@@ -1,80 +1,47 @@
-import React, { useState } from "react";
-
-const Login = () => {
+import React, { useState, useContext } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { AuthContext } from "./AuthContext";
+import Auth from "./Auth";
+import "./home.css";
+function Login() {
+  const auth = useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-
-  const validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  };
-
-  const handleSubmit = (e) => {
+  const [err, setErr] = useState("");
+  const from = location.state?.from?.pathname || "/dashboard";
+  function submit(e) {
     e.preventDefault();
-    setEmailError("");
-    setPasswordError("");
-
-    let valid = true;
-
-    if (!email.trim()) {
-      setEmailError("Email is required.");
-      valid = false;
-    } else if (!validateEmail(email.trim())) {
-      setEmailError("Please enter a valid email address.");
-      valid = false;
+    const res = Auth.login(email, password);
+    if (!res.ok) {
+      setErr(res.message);
+      return;
     }
-
-    if (!password.trim()) {
-      setPasswordError("Password is required.");
-      valid = false;
-    } else if (password.trim().length < 6) {
-      setPasswordError("Password must be at least 6 characters.");
-      valid = false;
-    }
-
-    if (valid) {
-      alert("Login successful!"); // for demo, you can replace with navigation
-    }
-  };
-
+    auth.setUser(Auth.me());
+    navigate(from, { replace: true });
+  }
   return (
-    <div className="login-container">
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit} noValidate>
-        {/* Email Field */}
-        <div className="form-group">
-          <label htmlFor="email">Email Address</label>
-          <input
-            type="email"
-            id="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          {emailError && <div className="error">{emailError}</div>}
+    <div className="auth-page">
+      <div className="auth-background">
+        <div className="background-overlay"></div>
+      </div>
+      <section className="section">
+        <div className="container">
+          <div className="card auth-card" style={{padding:20, position: 'relative', zIndex: 2}}>
+            <h3>Login</h3>
+            <p className="helper">Welcome back! Please sign in to continue.</p>
+            {err && <div className="error" style={{marginTop:8}}>{err}</div>}
+            <form className="form" onSubmit={submit}>
+              <input className="input" placeholder="Email" type="email" value={email} onChange={e=>setEmail(e.target.value)} />
+              <input className="input" placeholder="Password" type="password" value={password} onChange={e=>setPassword(e.target.value)} />
+              <button className="btn cta" type="submit">Sign in</button>
+            </form>
+            <p className="helper" style={{marginTop:10}}>No account? <Link to="/signup">Signup</Link></p>
+          </div>
         </div>
-
-        {/* Password Field */}
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          {passwordError && <div className="error">{passwordError}</div>}
-        </div>
-
-        <button type="submit">Login</button>
-      </form>
+      </section>
     </div>
   );
-};
-
+}
 export default Login;
