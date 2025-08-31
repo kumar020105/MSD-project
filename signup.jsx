@@ -1,132 +1,46 @@
 import React, { useState } from "react";
-
-const Signup = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  const [nameError, setNameError] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [confirmPasswordError, setConfirmPasswordError] = useState("");
-
-  const validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  };
-
-  const handleSubmit = (e) => {
+import { Link, useNavigate } from "react-router-dom";
+import Auth from "./Auth";
+import "./home.css";
+function Signup() {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
+  const [err, setErr] = useState("");
+  function submit(e) {
     e.preventDefault();
-
-    // Clear errors
-    setNameError("");
-    setEmailError("");
-    setPasswordError("");
-    setConfirmPasswordError("");
-
-    let valid = true;
-
-    if (!name.trim()) {
-      setNameError("Name is required.");
-      valid = false;
-    }
-
-    if (!email.trim()) {
-      setEmailError("Email is required.");
-      valid = false;
-    } else if (!validateEmail(email.trim())) {
-      setEmailError("Please enter a valid email address.");
-      valid = false;
-    }
-
-    if (!password.trim()) {
-      setPasswordError("Password is required.");
-      valid = false;
-    } else if (password.trim().length < 6) {
-      setPasswordError("Password must be at least 6 characters.");
-      valid = false;
-    }
-
-    if (!confirmPassword.trim()) {
-      setConfirmPasswordError("Please confirm your password.");
-      valid = false;
-    } else if (password !== confirmPassword) {
-      setConfirmPasswordError("Passwords do not match.");
-      valid = false;
-    }
-
-    if (valid) {
-      alert("Signup successful!"); // later connect with backend
-    }
-  };
-
+    setErr("");
+    if (!form.name || !form.email || !form.password) { setErr("All fields required."); return; }
+    if (form.password.length < 6) { setErr("Password must be at least 6 characters."); return; }
+    if (form.password !== form.confirm) { setErr("Passwords do not match."); return; }
+    const res = Auth.signup({ name: form.name, email: form.email, password: form.password });
+    if (!res.ok) { setErr(res.message); return; }
+    alert("Account created. Please login.");
+    navigate("/login");
+  }
   return (
-    <div className="signup-container">
-      <h2>Signup</h2>
-      <form onSubmit={handleSubmit} noValidate>
-        {/* Name Field */}
-        <div className="form-group">
-          <label htmlFor="name">Full Name</label>
-          <input
-            type="text"
-            id="name"
-            placeholder="Enter your full name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          {nameError && <div className="error">{nameError}</div>}
+    <div className="auth-page">
+      <div className="auth-background">
+        <div className="background-overlay"></div>
+      </div>
+      <section className="section">
+        <div className="container">
+          <div className="card auth-card" style={{padding:20, position: 'relative', zIndex: 2}}>
+            <h3>Create account</h3>
+            <p className="helper">Join our diners' club for perks & updates.</p>
+            {err && <div className="error" style={{marginTop:8}}>{err}</div>}
+            <form className="form" onSubmit={submit}>
+              <input className="input" placeholder="Full name" value={form.name} onChange={e=>setForm({...form, name:e.target.value})}/>
+              <input className="input" placeholder="Email" type="email" value={form.email} onChange={e=>setForm({...form, email:e.target.value})}/>
+              <input className="input" placeholder="Password" type="password" value={form.password} onChange={e=>setForm({...form, password:e.target.value})}/>
+              <input className="input" placeholder="Confirm password" type="password" value={form.confirm} onChange={e=>setForm({...form, confirm:e.target.value})}/>
+              <button className="btn cta" type="submit">Create account</button>
+            </form>
+            <p className="helper" style={{marginTop:10}}>Already have an account? <Link to="/login">Login</Link></p>
+          </div>
         </div>
-
-        {/* Email Field */}
-        <div className="form-group">
-          <label htmlFor="email">Email Address</label>
-          <input
-            type="email"
-            id="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          {emailError && <div className="error">{emailError}</div>}
-        </div>
-
-        {/* Password Field */}
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          {passwordError && <div className="error">{passwordError}</div>}
-        </div>
-
-        {/* Confirm Password Field */}
-        <div className="form-group">
-          <label htmlFor="confirmPassword">Confirm Password</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            placeholder="Re-enter your password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-          {confirmPasswordError && (
-            <div className="error">{confirmPasswordError}</div>
-          )}
-        </div>
-
-        <button type="submit">Signup</button>
-      </form>
+      </section>
     </div>
   );
-};
+}
 
 export default Signup;
