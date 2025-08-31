@@ -11,7 +11,6 @@ import {
   useLocation,
 } from "react-router-dom";
 import "./home.css";
-
 const SAMPLE_CATEGORIES = ["All", "Starters", "Mains", "Desserts", "Drinks"]
 const SAMPLE_ITEMS = [
   { id: 1, title: "Truffle Fries", cat: "Starters", price: 450, img: "https://images.unsplash.com/photo-1544025162-d76694265947" },
@@ -52,12 +51,8 @@ const SAMPLE_ITEMS = [
   { id: 36, title: "pepsi", cat: "Drinks", price: 100, img: "https://www.pepsicopartners.com/medias/Article-Preview.jpg?context=bWFzdGVyfHJvb3R8MjA1MzY1fGltYWdlL2pwZWd8YURBM0wyZzVaQzh4TURBNE1qRTFORGd3TnpNeU5pOUJjblJwWTJ4bElGQnlaWFpwWlhjdWFuQm58NWFlOGI5YWFmNjY2OGViZGY2NmIwYmFiMzczMGZjNDdlODM5M2QyMmEwNDJiYjY3ZmVhOTkwNmY3NDRhYThkNA" },
 
 ];
-
-
-
 const LS_USERS = "tt_users_v1";
 const LS_SESSION = "tt_session_v1";
-
 const Auth = {
   signup({ name, email, password }) {
     const users = JSON.parse(localStorage.getItem(LS_USERS) || "[]");
@@ -86,8 +81,6 @@ const Auth = {
     }
   },
 };
-
-
 const AuthContext = createContext(null);
 function useAuth() {
   return useContext(AuthContext);
@@ -101,8 +94,6 @@ function ProtectedRoute({ children }) {
   }
   return children;
 }
-
-
 function Navbar({ cartCount }) {
   const auth = useAuth();
   return (
@@ -132,7 +123,6 @@ function Navbar({ cartCount }) {
     </div>
   );
 }
-
 function Footer() {
   return (
     <footer>
@@ -147,8 +137,6 @@ function Footer() {
     </footer>
   );
 }
-
-
 function Home() {
   return (
     <>
@@ -188,8 +176,6 @@ function Home() {
     </>
   );
 }
-
-
 function Menu({ onAdd }) {
   const [active, setActive] = useState("All");
   const [q, setQ] = useState("");
@@ -200,7 +186,6 @@ function Menu({ onAdd }) {
       (q.trim() === "" || it.title.toLowerCase().includes(q.toLowerCase()))
     );
   }, [active, q]);
-
   return (
     <section className="section" id="order">
       <div className="container">
@@ -215,7 +200,6 @@ function Menu({ onAdd }) {
             ))}
           </div>
         </div>
-
         <div className="menu-grid" style={{marginTop:18}}>
           {filtered.map((it) => (
             <div className="card" key={it.id} role="article" aria-label={it.title}>
@@ -235,12 +219,9 @@ function Menu({ onAdd }) {
     </section>
   );
 }
-
-
 function Reserve() {
   const [form, setForm] = useState({ name: "", email: "", date: "", time: "", guests: 2, notes: "" });
   const [ok, setOk] = useState("");
-
   function submit(e) {
     e.preventDefault();
     if (!form.name || !form.email || !form.date || !form.time) {
@@ -254,7 +235,6 @@ function Reserve() {
     setForm({ name: "", email: "", date: "", time: "", guests: 2, notes: "" });
     setTimeout(()=>setOk(""), 5000);
   }
-
   return (
     <section className="section">
       <div className="container">
@@ -280,12 +260,9 @@ function Reserve() {
     </section>
   );
 }
-
-
 function Cart({ cart, onUpdate, onClear }) {
   const navigate = useNavigate();
   const subtotal = cart.reduce((s, it) => s + it.price * it.qty, 0);
-
   function checkout() {
     // simple checkout: save order to localStorage and clear cart
     const orders = JSON.parse(localStorage.getItem("tt_orders") || "[]");
@@ -296,7 +273,6 @@ function Cart({ cart, onUpdate, onClear }) {
     navigate("/dashboard");
     alert("Order placed! Check Dashboard for details.");
   }
-
   if (cart.length === 0) return (
     <section className="section">
       <div className="container">
@@ -306,7 +282,6 @@ function Cart({ cart, onUpdate, onClear }) {
       </div>
     </section>
   );
-
   return (
     <section className="section">
       <div className="container">
@@ -326,7 +301,6 @@ function Cart({ cart, onUpdate, onClear }) {
             </div>
           ))}
         </div>
-
         <div style={{marginTop:16, display:'flex', justifyContent:'space-between', alignItems:'center'}}>
           <div>
             <div className="helper">Subtotal</div>
@@ -341,7 +315,6 @@ function Cart({ cart, onUpdate, onClear }) {
     </section>
   );
 }
-
 function AuthBackground() {
   return (
     <div className="auth-background">
@@ -349,7 +322,6 @@ function AuthBackground() {
     </div>
   );
 }
-
 function Login() {
   const auth = useAuth();
   const navigate = useNavigate();
@@ -357,9 +329,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
-
   const from = location.state?.from?.pathname || "/dashboard";
-
   function submit(e) {
     e.preventDefault();
     const res = Auth.login(email, password);
@@ -370,13 +340,11 @@ function Login() {
     auth.setUser(Auth.me());
     navigate(from, { replace: true });
   }
-
   return (
     <div className="auth-page">
       <div className="auth-background">
         <div className="background-overlay"></div>
       </div>
-      
       <section className="section">
         <div className="container">
           <div className="card auth-card" style={{padding:20, position: 'relative', zIndex: 2}}>
@@ -395,13 +363,11 @@ function Login() {
     </div>
   );
 }
-
 function Signup() {
   const auth = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
   const [err, setErr] = useState("");
-
   function submit(e) {
     e.preventDefault();
     setErr("");
@@ -413,7 +379,6 @@ function Signup() {
     alert("Account created. Please login.");
     navigate("/login");
   }
-
   return (
     <div className="auth-page">
       <AuthBackground />
@@ -421,7 +386,7 @@ function Signup() {
         <div className="container">
           <div className="card auth-card" style={{padding:20, position: 'relative', zIndex: 2}}>
             <h3>Create account</h3>
-            <p className="helper">Join our diners' club for perks & updates.</p>
+            <p className="helper">Join our restaurant for perks & updates.</p>
             {err && <div className="error" style={{marginTop:8}}>{err}</div>}
             <form className="form" onSubmit={submit}>
               <input className="input" placeholder="Full name" value={form.name} onChange={e=>setForm({...form, name:e.target.value})}/>
@@ -437,8 +402,6 @@ function Signup() {
     </div>
   );
 }
-
-
 function Dashboard() {
   const [me, setMe] = useState(null);
   const navigate = useNavigate();
@@ -448,12 +411,9 @@ function Dashboard() {
     if (!u) { navigate("/login"); return; }
     setMe(u);
   }, [navigate]);
-
   if (!me) return null;
-
   const orders = JSON.parse(localStorage.getItem("tt_orders") || "[]").filter(o => o.email === me.email).sort((a,b)=>b.createdAt - a.createdAt);
   const bookings = JSON.parse(localStorage.getItem("tt_bookings") || "[]").filter(b => b.email === me.email).sort((a,b)=>b.createdAt - a.createdAt);
-
   return (
     <section className="section">
       <div className="container">
@@ -462,7 +422,6 @@ function Dashboard() {
             <h3>Welcome, {me.name || me.email}</h3>
             <button className="btn" onClick={() => { Auth.logout(); navigate("/"); }}>Logout</button>
           </div>
-
           <div style={{marginTop:12}}>
             <h4>Your latest orders</h4>
             {orders.length === 0 ? <p className="helper">No orders yet.</p> : orders.map(o => (
@@ -474,7 +433,6 @@ function Dashboard() {
               </div>
             ))}
           </div>
-
           <div style={{marginTop:12}}>
             <h4>Your reservations</h4>
             {bookings.length === 0 ? <p className="helper">No reservations yet.</p> : bookings.map((b,i)=>(
@@ -492,8 +450,6 @@ function Dashboard() {
     </section>
   );
 }
-
-
 function NotFound() {
   return (
     <section className="section">
@@ -505,24 +461,15 @@ function NotFound() {
     </section>
   );
 }
-
-
-
 export default function AppRoot() {
-  
   const [user, setUser] = useState(Auth.me());
-
-  
   const [cart, setCart] = useState(() => {
     try { return JSON.parse(localStorage.getItem("tt_cart") || "[]"); } catch { return []; }
   });
-
   useEffect(() => {
     localStorage.setItem("tt_cart", JSON.stringify(cart));
   }, [cart]);
-
   useEffect(() => {
-   
     function handler(e) {
       if (e.key === "tt_cart") {
         try { setCart(JSON.parse(e.newValue || "[]")); } catch {}
@@ -534,7 +481,6 @@ export default function AppRoot() {
     window.addEventListener("storage", handler);
     return () => window.removeEventListener("storage", handler);
   }, []);
-
   function addToCart(item) {
     setCart(prev => {
       const found = prev.find(p => p.id === item.id);
@@ -542,17 +488,13 @@ export default function AppRoot() {
       return [...prev, { ...item, qty: 1 }];
     });
   }
-
   function updateCartItem(id, qty) {
     setCart(prev => prev.map(p => p.id === id ? { ...p, qty } : p).filter(p => p.qty > 0));
   }
-
   function clearCart() {
     setCart([]);
   }
-
   const value = { user, setUser };
-
   return (
     <AuthContext.Provider value={value}>
       <Router>
