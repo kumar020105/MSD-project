@@ -954,7 +954,7 @@ function Dashboard() {
             {orders.length === 0 ? (
               <p className="helper">No orders yet.</p>
             ) : orders.map(o => (
-              <div key={o.id} className="card" style={{marginTop:12, padding:16}}>
+              <div key={o.id} className="card" style={{marginTop:12, padding:16, display: 'flex', flexDirection: 'column'}}>
                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:12}}>
                   <div>
                     <strong>Order #{o.id.toString().slice(-6)}</strong> 
@@ -967,9 +967,20 @@ function Dashboard() {
                   <strong>Items:</strong>
                   <div style={{marginTop: 8}}>
                     {o.items.map((item, index) => (
-                      <div key={index} style={{display: 'flex', justifyContent: 'space-between', marginBottom: 4}}>
-                        <span>{item.title} × {item.qty}</span>
-                        <span>₹{(item.price * item.qty).toFixed(2)}</span>
+                      <div key={index} style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: 12}}>
+                        <img 
+                          src={item.img} 
+                          alt={item.title} 
+                          style={{width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px'}}
+                        />
+                        <div style={{flex: 1}}>
+                          <div style={{fontWeight: 'bold'}}>{item.title}</div>
+                          <div className="helper">₹{item.price.toFixed(2)} each</div>
+                        </div>
+                        <div style={{minWidth: '80px', textAlign: 'right'}}>
+                          <div>× {item.qty}</div>
+                          <div style={{fontWeight: 'bold'}}>₹{(item.price * item.qty).toFixed(2)}</div>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -980,65 +991,55 @@ function Dashboard() {
 
           <div style={{marginTop:24}}>
             <h4>Your Table Reservations</h4>
-             {tableBookings.length === 0 ? (
-    <p className="helper">No table reservations yet.</p>
-  ) : tableBookings.map((b,i)=>(
-    <div key={i} className="card" style={{marginTop:12, padding:16}}>
-      <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start'}}>
-        <div>
-          <strong>{b.name}</strong> 
-          <div className="helper">{b.email}</div>
-        </div>
-        <div>
-          <div className="helper">{b.date} at {b.time}</div>
-          <div className="helper">{b.guests} guest{b.guests !== 1 ? 's' : ''}</div>
-          {b.total > 0 && <div className="helper">Dishes: ₹{b.total?.toFixed(2)}</div>}
-        </div>
-      </div>
-      {b.dishes && b.dishes.length > 0 && (
-        <div style={{marginTop: 12, paddingTop: 12, borderTop: '1px solid #eee'}}>
-          <strong>Ordered Dishes:</strong>
-          <div style={{marginTop: 8}}>
-            {b.dishes.map((dish, index) => (
-              <div key={index} style={{display: 'flex', justifyContent: 'space-between', marginBottom: 4}}>
-                <span>{dish.title} × {dish.quantity}</span>
-                <span>₹{(dish.price * dish.quantity).toFixed(2)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      
-      {b.notes && (
-        <div style={{marginTop: 12, paddingTop: 12, borderTop: '1px solid #eee'}}>
-          <strong>Notes:</strong> {b.notes}
-        </div>
-      )}
-    </div>
-  ))}
-</div>
-          <div style={{marginTop:24}}>
-            <h4>Your Suite Reservations</h4>
-            {suiteBookings.length === 0 ? (
-              <p className="helper">No suite reservations yet.</p>
-            ) : suiteBookings.map((b,i)=>(
+            {tableBookings.length === 0 ? (
+              <p className="helper">No table reservations yet.</p>
+            ) : tableBookings.map((b,i)=>(
               <div key={i} className="card" style={{marginTop:12, padding:16}}>
                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start'}}>
                   <div>
-                    <strong>{b.suiteName}</strong> 
-                    <div className="helper">{b.name} - {b.email}</div>
+                    <strong>{b.name}</strong> 
+                    <div className="helper">{b.email}</div>
                   </div>
-                  <div style={{textAlign: 'right'}}>
-                    <strong>₹{(b.suitePrice * Math.ceil((new Date(b.checkOut) - new Date(b.checkIn)) / (1000 * 60 * 60 * 24))).toFixed(2)}</strong>
+                  <div>
+                    <div className="helper">{b.date} at {b.time}</div>
+                    <div className="helper">{b.guests} guest{b.guests !== 1 ? 's' : ''}</div>
+                    {b.total > 0 && <div className="helper">Dishes: ₹{b.total?.toFixed(2)}</div>}
                   </div>
                 </div>
-                <div className="helper" style={{marginTop: 8}}>
-                  {b.checkIn} to {b.checkOut} ({Math.ceil((new Date(b.checkOut) - new Date(b.checkIn)) / (1000 * 60 * 60 * 24))} nights)
-                </div>
-                <div className="helper">{b.guests} guest{b.guests !== 1 ? 's' : ''}</div>
+                
+                {b.dishes && b.dishes.length > 0 && (
+                  <div style={{marginTop: 12, paddingTop: 12, borderTop: '1px solid #eee'}}>
+                    <strong>Ordered Dishes:</strong>
+                    <div style={{marginTop: 8}}>
+                      {b.dishes.map((dish, index) => {
+                        const menuItem = SAMPLE_ITEMS.find(item => item.id === dish.id);
+                        return (
+                          <div key={index} style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: 12}}>
+                            {menuItem && (
+                              <img 
+                                src={menuItem.img} 
+                                alt={dish.title} 
+                                style={{width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px'}}
+                              />
+                            )}
+                            <div style={{flex: 1}}>
+                              <div style={{fontWeight: 'bold'}}>{dish.title}</div>
+                              <div className="helper">₹{dish.price.toFixed(2)} each</div>
+                            </div>
+                            <div style={{minWidth: '80px', textAlign: 'right'}}>
+                              <div>× {dish.quantity}</div>
+                              <div style={{fontWeight: 'bold'}}>₹{(dish.price * dish.quantity).toFixed(2)}</div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+                
                 {b.notes && (
                   <div style={{marginTop: 12, paddingTop: 12, borderTop: '1px solid #eee'}}>
-                    <strong>Special requests:</strong> {b.notes}
+                    <strong>Notes:</strong> {b.notes}
                   </div>
                 )}
               </div>
@@ -1046,32 +1047,94 @@ function Dashboard() {
           </div>
 
           <div style={{marginTop:24}}>
+            <h4>Your Suite Reservations</h4>
+            {suiteBookings.length === 0 ? (
+              <p className="helper">No suite reservations yet.</p>
+            ) : suiteBookings.map((b,i)=>{
+              const suite = SAMPLE_SUITES.find(s => s.id === parseInt(b.suite));
+              const nights = b.checkIn && b.checkOut ? 
+                Math.ceil((new Date(b.checkOut) - new Date(b.checkIn)) / (1000 * 60 * 60 * 24)) : 0;
+              
+              return (
+                <div key={i} className="card" style={{marginTop:12, padding:16}}>
+                  <div style={{display: 'flex', gap: '16px', marginBottom: '12px'}}>
+                    {suite && (
+                      <img 
+                        src={suite.img} 
+                        alt={suite.name} 
+                        style={{width: '120px', height: '90px', objectFit: 'cover', borderRadius: '8px'}}
+                      />
+                    )}
+                    <div style={{flex: 1}}>
+                      <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start'}}>
+                        <div>
+                          <strong>{suite?.name || b.suiteName}</strong> 
+                          <div className="helper">{b.name} - {b.email}</div>
+                        </div>
+                        <div style={{textAlign: 'right'}}>
+                          <strong>₹{((suite?.price || b.suitePrice) * nights).toFixed(2)}</strong>
+                        </div>
+                      </div>
+                      <div className="helper" style={{marginTop: 8}}>
+                        {b.checkIn} to {b.checkOut} ({nights} nights)
+                      </div>
+                      <div className="helper">{b.guests} guest{b.guests !== 1 ? 's' : ''}</div>
+                    </div>
+                  </div>
+                  
+                  {b.notes && (
+                    <div style={{marginTop: 12, paddingTop: 12, borderTop: '1px solid #eee'}}>
+                      <strong>Special requests:</strong> {b.notes}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div style={{marginTop:24}}>
             <h4>Your Event Inquiries</h4>
             {eventBookings.length === 0 ? (
               <p className="helper">No event inquiries yet.</p>
-            ) : eventBookings.map((b,i)=>(
-              <div key={i} className="card" style={{marginTop:12, padding:16}}>
-                <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start'}}>
-                  <div>
-                    <strong>{b.eventName}</strong> 
-                    <div className="helper">{b.name} - {b.email}</div>
+            ) : eventBookings.map((b,i)=>{
+              const event = SAMPLE_EVENTS.find(e => e.id === parseInt(b.venue));
+              
+              return (
+                <div key={i} className="card" style={{marginTop:12, padding:16}}>
+                  <div style={{display: 'flex', gap: '16px', marginBottom: '12px'}}>
+                    {event && (
+                      <img 
+                        src={event.img} 
+                        alt={event.name} 
+                        style={{width: '120px', height: '90px', objectFit: 'cover', borderRadius: '8px'}}
+                      />
+                    )}
+                    <div style={{flex: 1}}>
+                      <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start'}}>
+                        <div>
+                          <strong>{event?.name || b.eventName}</strong> 
+                          <div className="helper">{b.name} - {b.email}</div>
+                        </div>
+                        <div style={{textAlign: 'right'}}>
+                          <strong>₹{(event?.price || b.eventPrice).toFixed(2)} starting price</strong>
+                        </div>
+                      </div>
+                      <div style={{marginTop: 8}}>
+                        <div className="helper"><strong>Event Date:</strong> {b.eventDate}</div>
+                        <div className="helper"><strong>Event Type:</strong> {b.eventType}</div>
+                        <div className="helper"><strong>Guests:</strong> {b.guests}</div>
+                      </div>
+                    </div>
                   </div>
-                  <div style={{textAlign: 'right'}}>
-                    <strong>₹{b.eventPrice.toFixed(2)} starting price</strong>
-                  </div>
+                  
+                  {b.notes && (
+                    <div style={{marginTop: 12, paddingTop: 12, borderTop: '1px solid #eee'}}>
+                      <strong>Event details:</strong> {b.notes}
+                    </div>
+                  )}
                 </div>
-                <div style={{marginTop: 8}}>
-                  <div className="helper"><strong>Event Date:</strong> {b.eventDate}</div>
-                  <div className="helper"><strong>Event Type:</strong> {b.eventType}</div>
-                  <div className="helper"><strong>Guests:</strong> {b.guests}</div>
-                </div>
-                {b.notes && (
-                  <div style={{marginTop: 12, paddingTop: 12, borderTop: '1px solid #eee'}}>
-                    <strong>Event details:</strong> {b.notes}
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
